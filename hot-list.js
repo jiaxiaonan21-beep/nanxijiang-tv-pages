@@ -1,4 +1,4 @@
-import {fetchData,safeUrl} from './core.js';
+import {fetchData,safeUrl} from './core.js?v=1.0.3';
 
 export const HOT_LISTS=[
  {id:'movie',label:'电影周榜',path:'/v2/douban/weekly/movie'},
