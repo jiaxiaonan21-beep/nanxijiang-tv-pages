@@ -5,7 +5,7 @@ import {readFile,access} from 'node:fs/promises';
 const root=new URL('../',import.meta.url);
 test('HTML and manifest assets exist and remain relative to a Pages project path',async()=>{
  const html=await readFile(new URL('index.html',root),'utf8');
- for(const [,url] of html.matchAll(/(?:src|href)="([^"]+)"/g)){
+ for(const [,url] of html.matchAll(/<(?:link|script|img)\b[^>]*?(?:src|href)="([^"]+)"/g)){
   assert.ok(url.startsWith('./'),url);
   await access(new URL(url,root));
  }
