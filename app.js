@@ -1,6 +1,7 @@
-import {DATA_KEY,safeUrl,apiUrl,episodesOf,sourcesOf,historyOf,resumeTarget,timeLabel,fetchJson} from './core.js?v=1.0.3';
-import {initHotList} from './hot-ui.js?v=1.0.3';
-import {initFullscreen} from './fullscreen.js?v=1.0.3';
+import {DATA_KEY,safeUrl,apiUrl,episodesOf,sourcesOf,historyOf,resumeTarget,timeLabel,fetchJson} from './core.js?v=1.0.4';
+import {initHotList} from './hot-ui.js?v=1.0.4';
+import {initFullscreen} from './fullscreen.js?v=1.0.4';
+import {initLibrary} from './library.js?v=1.0.4';
 const $=id=>document.getElementById(id),video=$('video');
 const defaults=[{name:'非凡影视（候选）',url:'https://cj.ffzyapi.com/api.php/provide/vod/',enabled:false},{name:'暴风资源',url:'https://bfzyapi.com/api.php/provide/vod/'},{name:'量子资源',url:'https://cj.lziapi.com/api.php/provide/vod/'},{name:'金鹰资源（候选）',url:'https://jyzyapi.com/api.php/provide/vod/',enabled:false},{name:'优质资源（候选）',url:'https://api.1080zyku.com/inc/apijson.php',enabled:false}];
 let sources=sourcesOf(defaults),history=[],active=null,hls=null,restoring=false,lastSave=0,searchController=null,detailController=null,page=1,pages=1,query='',localUrl=null,detailNonce=0;
@@ -9,7 +10,7 @@ function message(text){$('message').textContent=text;}
 function persist(){try{localStorage.setItem(DATA_KEY,JSON.stringify({sources,history}));}catch{message('本机存储空间不足或浏览器禁止存储，请导出记录备份。');}}
 function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
 function button(text,fn){const el=node('button',text);el.type='button';el.addEventListener('click',fn);return el;}
-function showTab(tab){for(const name of ['search','history','settings'])$(name+'-page').hidden=name!==tab;document.querySelectorAll('nav [data-tab]').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false'));if(tab==='history')renderHistory();if(tab==='settings')renderSources();message('');}
+function showTab(tab){for(const name of ['search','library','history','settings'])$(name+'-page').hidden=name!==tab;document.querySelectorAll('nav [data-tab]').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false'));if(tab==='library')library.open();else library.cancel();if(tab==='history')renderHistory();if(tab==='settings')renderSources();message('');}
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
 function saveProgress(force=false){if(!active||active.local||restoring||video.readyState<1||video.error||video.seeking)return;if(!force&&Date.now()-lastSave<4000)return;lastSave=Date.now();active.position=Number.isFinite(video.currentTime)?video.currentTime:0;active.duration=Number.isFinite(video.duration)?video.duration:0;active.updated=Date.now();history=[{...active},...history.filter(h=>h.id!==active.id)].slice(0,100);persist();}
 function stop(){saveProgress(true);hls?.destroy();hls=null;video.pause();video.removeAttribute('src');video.load();if(localUrl){URL.revokeObjectURL(localUrl);localUrl=null;}}
@@ -39,5 +40,6 @@ $('direct-form').onsubmit=e=>{e.preventDefault();const url=safeUrl($('direct-url
 $('local-video').onchange=e=>{const file=e.target.files?.[0];if(!file)return;stop();active={id:'local',title:file.name,source:'本地视频',episodes:[],index:0,position:0,local:true};localUrl=URL.createObjectURL(file);active.episodes=[{name:'本地视频',url:localUrl}];const url=localUrl;localUrl=null;loadEpisode(0);localUrl=url;e.target.value='';};
 if('serviceWorker'in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('./sw.js').then(reg=>{const offer=()=>{if(reg.waiting)$('update-app').hidden=false;};offer();reg.addEventListener('updatefound',()=>{reg.installing?.addEventListener('statechange',offer);});$('update-app').onclick=()=>{if(!confirm('更新会重新载入页面，请先暂停视频。'))return;saveProgress(true);if(reg.waiting){navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload(),{once:true});reg.waiting.postMessage({type:'SKIP_WAITING'});}else location.reload();};}).catch(()=>message('浏览器未允许离线缓存，联网播放功能仍可使用。'));}
 renderSources();
+const library=initLibrary({getSources:()=>sources.filter(s=>s.enabled),onPick:(vod,source)=>void openVod(vod,source)});
 initHotList(title=>{$('query').value=title;void search();$('search-results').scrollIntoView({behavior:'smooth',block:'start'});});
 $('back-home').onclick=()=>{searchController?.abort();detailNonce++;detailController?.abort();$('hot-section').hidden=false;$('search-results').hidden=true;$('back-home').hidden=true;message('');};

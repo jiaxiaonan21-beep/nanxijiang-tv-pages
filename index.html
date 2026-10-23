@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101723"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="南溪江TV"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><link rel="icon" href="./icons/icon-192.png"><link rel="stylesheet" href="./style.css?v=1.0.3"><title>南溪江TV · Pages</title></head>
-<body><header><a href="./" class="brand">南溪江<span>TV</span></a><span class="badge">Pages 测试版</span><nav aria-label="页面"><button data-tab="search" aria-current="page">片库</button><button data-tab="history">历史</button><button data-tab="settings">设置</button></nav></header>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101723"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="南溪江TV"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icons/icon-192.png"><link rel="icon" href="./icons/icon-192.png"><link rel="stylesheet" href="./style.css?v=1.0.4"><title>南溪江TV · Pages</title></head>
+<body><header><a href="./" class="brand">南溪江<span>TV</span></a><span class="badge">Pages 测试版</span><nav aria-label="页面"><button data-tab="search" aria-current="page">网络热榜</button><button data-tab="library">片源库</button><button data-tab="history">历史</button><button data-tab="settings">设置</button></nav></header>
 <main><section id="player-panel" hidden><div class="player-heading"><h1 id="playing-title"></h1><button id="close-player">收起播放器</button></div><div id="video-wrap"><video id="video" controls playsinline webkit-playsinline preload="metadata"></video>
 <div id="screen-controls" hidden>
   <div class="screen-top screen-ui"><button id="native-screen">系统全屏</button><button id="exit-screen">退出全屏</button></div>
@@ -12,9 +12,9 @@
 <section id="search-page">
   <div class="hero"><p class="eyebrow">你的片源，你的播放记录</p><h1>想看什么？</h1><p class="muted">直接连接片源，观看记录保存在这台设备。</p></div>
   <form id="search-form"><label class="sr-only" for="query">搜索影片</label><input id="query" type="search" placeholder="输入影片名称" required maxlength="200"><button class="primary" type="submit">搜索</button></form>
-  <button id="back-home" hidden>← 返回首页热榜</button>
+  <button id="back-home" hidden>← 返回网络热榜</button>
   <section id="hot-section" aria-labelledby="hot-heading">
-    <div class="search-heading"><h2 id="hot-heading">首页热榜</h2><button id="refresh-hot">刷新热榜</button></div>
+    <div class="search-heading"><h2 id="hot-heading">网络热榜</h2><button id="refresh-hot">刷新热榜</button></div>
     <p class="muted hot-description">发现热门影片，点击海报搜索片源。榜单不代表影片一定可播。</p>
     <div id="hot-tabs" class="hot-tabs" aria-label="热榜分类"></div>
     <p id="hot-status" class="muted" role="status" aria-live="polite"></p>
@@ -27,6 +27,16 @@
     <div class="pager" id="pager" hidden><button id="page-prev">上一页</button><span id="page-label"></span><button id="page-next">下一页</button></div>
   </div>
 </section>
+<section id="library-page" hidden aria-labelledby="library-heading">
+  <div class="search-heading"><h1 id="library-heading">片源库</h1><button id="library-refresh">刷新列表</button></div>
+  <div class="library-toolbar"><label for="library-source">选择片源</label><select id="library-source" aria-label="选择片源"></select><button data-tab="settings">管理片源</button></div>
+  <p class="muted hot-description">按所选片源的分类浏览，点击影片查看选集。</p>
+  <div id="library-groups" class="category-chips" aria-label="片源分类"></div>
+  <div id="library-children" class="category-chips subcategories" aria-label="细分分类"></div>
+  <p id="library-status" class="muted" role="status" aria-live="polite"></p>
+  <div id="library-grid" class="grid"></div>
+  <div id="library-pager" class="library-pager" hidden aria-label="片源库分页"></div>
+</section>
 <section id="history-page" hidden><div class="search-heading"><h1>播放历史</h1><div class="tools"><button id="delete-selected">删除选中</button><button id="delete-unselected">删除未选中</button></div></div><p class="muted">点击继续播放，可恢复到上次观看的位置。记录仅保存在当前浏览器或主屏幕 App。</p><div id="history-list"></div></section>
 <section id="settings-page" hidden><h1>片源与本机数据</h1><p class="notice">此版本没有服务器中转。片源需支持 HTTPS 和浏览器跨域访问；网站可访问不代表所有片源可用。</p><div id="sources"></div><form id="source-form" class="panel"><h2>添加 JSON 片源</h2><label>名称<input id="source-name" required maxlength="60"></label><label>接口地址<input id="source-url" type="url" required placeholder="https://example.com/api.php/provide/vod/"></label><button class="primary">添加片源</button></form><div class="panel"><h2>备份与导入</h2><p class="muted">备份包含片源和观看记录，只在你点击导出时保存到文件。</p><div class="tools"><button id="export">导出本机备份</button><label class="file-button">导入 JSON<input id="import" type="file" accept="application/json,.json"></label></div></div><div class="panel"><h2>播放直链或本地视频</h2><form id="direct-form"><label>HTTPS MP4 / HLS 地址<input id="direct-url" type="url" required placeholder="https://example.com/video.m3u8"></label><button>播放直链</button></form><label class="file-button">打开本地视频<input id="local-video" type="file" accept="video/*"></label><p class="muted">本地文件需要每次重新选择；网页不会删除原文件，也不会上传视频。</p></div><div class="panel"><h2>添加到主屏幕</h2><p>iPhone / iPad：用 Safari 打开已发布的网址，点击分享 → 添加到主屏幕。更新发布后，刷新页面即可。</p><button id="update-app" hidden>更新并重新载入</button><p class="muted">离线缓存只包含页面和播放器代码，不缓存影片。页面无登录密码，访问者的记录保存在各自设备。</p></div></section>
-<p id="message" role="status" aria-live="polite"></p></main><footer>南溪江TV Pages · 1.0.3 · 个人静态播放器</footer><script src="./vendor/hls.min.js?v=1.0.3"></script><script type="module" src="./app.js?v=1.0.3"></script></body></html>
+<p id="message" role="status" aria-live="polite"></p></main><footer>南溪江TV Pages · 1.0.4 · 个人静态播放器</footer><script src="./vendor/hls.min.js?v=1.0.4"></script><script type="module" src="./app.js?v=1.0.4"></script></body></html>

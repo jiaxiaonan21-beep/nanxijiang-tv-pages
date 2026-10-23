@@ -1,5 +1,5 @@
-const PREFIX='nanxijiang-pages-',CACHE=PREFIX+'1.0.3';
-const SHELL=['./','./index.html','./style.css?v=1.0.3','./app.js?v=1.0.3','./core.js?v=1.0.3','./hot-list.js?v=1.0.3','./hot-ui.js?v=1.0.3','./fullscreen.js?v=1.0.3','./vendor/hls.min.js?v=1.0.3','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
+const PREFIX='nanxijiang-pages-',CACHE=PREFIX+'1.0.4';
+const SHELL=['./','./index.html','./style.css?v=1.0.4','./app.js?v=1.0.4','./core.js?v=1.0.4','./hot-list.js?v=1.0.4','./hot-ui.js?v=1.0.4','./fullscreen.js?v=1.0.4','./library.js?v=1.0.4','./vendor/hls.min.js?v=1.0.4','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL.map(path=>new Request(new URL(path,self.registration.scope),{cache:'reload'}))))));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith(PREFIX)&&key!==CACHE)await caches.delete(key);await self.clients.claim();})()));
 self.addEventListener('message',e=>{if(e.data?.type==='SKIP_WAITING')self.skipWaiting();});

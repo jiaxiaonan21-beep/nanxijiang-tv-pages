@@ -8,17 +8,17 @@ test('entry, stylesheet and every local module import use the release version',a
  const version=JSON.parse(await readFile(new URL('package.json',root),'utf8')).version;
  const html=await readFile(new URL('index.html',root),'utf8');
  for(const asset of ['app.js','style.css','vendor/hls.min.js'])assert.ok(html.includes(`./${asset}?v=${version}`),asset);
- for(const file of ['app.js','hot-ui.js','hot-list.js','fullscreen.js']){
+ for(const file of ['app.js','hot-ui.js','hot-list.js','fullscreen.js','library.js']){
   const code=await readFile(new URL(file,root),'utf8');
   for(const [,path] of code.matchAll(/from '(\.\/[^']+)'/g))assert.equal(new URL(path,'https://example.com/project/').searchParams.get('v'),version,`${file}: ${path}`);
  }
  const sw=await readFile(new URL('sw.js',root),'utf8');
- for(const asset of ['app.js','core.js','hot-ui.js','hot-list.js','fullscreen.js','style.css','vendor/hls.min.js'])assert.ok(sw.includes(`./${asset}?v=${version}`));
+ for(const asset of ['app.js','core.js','hot-ui.js','hot-list.js','fullscreen.js','library.js','style.css','vendor/hls.min.js'])assert.ok(sw.includes(`./${asset}?v=${version}`));
 });
 test('all literal DOM IDs referenced by scripts exist in the same release HTML',async()=>{
  const html=await readFile(new URL('index.html',root),'utf8');
  const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]));
- for(const file of ['app.js','hot-ui.js']){
+ for(const file of ['app.js','hot-ui.js','library.js']){
   const code=await readFile(new URL(file,root),'utf8');
   for(const [,id] of code.matchAll(/(?:\$|getElementById)\('([^']+)'\)/g))assert.ok(ids.has(id),`${file} references missing #${id}`);
  }
@@ -44,5 +44,5 @@ test('worker revalidates HTML and does not intercept remote sources or video ran
 test('offline fallback is scoped to the current release cache',async()=>{
  const {handlers,opened}=await worker(async()=>{throw new Error('offline');},()=>new Response('current cached HTML'));
  let response;handlers.fetch({request:new Request('https://example.com/project/'),respondWith:value=>{response=value;}});
- assert.equal(await (await response).text(),'current cached HTML');assert.deepEqual(opened,['nanxijiang-pages-1.0.3']);
+ assert.equal(await (await response).text(),'current cached HTML');assert.deepEqual(opened,['nanxijiang-pages-1.0.4']);
 });

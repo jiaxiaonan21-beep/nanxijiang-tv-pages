@@ -1,4 +1,4 @@
-import {HOT_LISTS,fetchHotList,readHotCache,writeHotCache} from './hot-list.js?v=1.0.3';
+import {HOT_LISTS,fetchHotList,readHotCache,writeHotCache} from './hot-list.js?v=1.0.4';
 
 export function initHotList(onPick){
  const tabs=document.getElementById('hot-tabs'),grid=document.getElementById('hot-grid'),status=document.getElementById('hot-status');
